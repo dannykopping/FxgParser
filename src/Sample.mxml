@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   applicationComplete="loadSVG();">
+			   
+	<fx:Declarations>
+	</fx:Declarations>
+	
+	<fx:Script><![CDATA[
+		
+		import flash.events.Event;
+		import flash.net.*;
+		import fxgparser.FxgDisplay;
+		import spark.core.SpriteVisualElement;
+		
+		
+		public var fxgurl:String = "fxg/fxgparser.fxg";
+		public var fxgSprite:FxgDisplay;
+		
+		public function loadSVG():void {
+			XML.ignoreWhitespace = false;	//to preserve spaces inside texts
+			var loader:URLLoader = new URLLoader( new URLRequest( fxgurl ) );
+			loader.addEventListener( Event.COMPLETE , displayData );
+		}
+		
+		public function displayData( e:Event ):void {
+			var fxgxml:XML = XML( e.currentTarget.data );
+			fxgSprite = new FxgDisplay( fxgxml );	//parse SVG
+			canvas.addChild( fxgSprite );
+		}
+
+	]]></fx:Script>
+	
+	<s:SpriteVisualElement id="canvas" />
+	
+</s:Application>

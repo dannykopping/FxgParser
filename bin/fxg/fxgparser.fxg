@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Graphic version="2.0" viewHeight="248.741" viewWidth="441.453" xmlns="http://ns.adobe.com/fxg/2008">
+  <Group d:type="layer" d:userLabel="svg2" xmlns:d="http://ns.adobe.com/fxg/2008/dt">
+
+        <Rect width="441.453" height="248.741">
+          <fill>
+            <RadialGradient x="16.0092" y="6.15625" scaleX="1231.36" scaleY="-592.154" rotation="33.3042">
+              <GradientEntry color="#ffffcb" ratio="0"/>
+              <GradientEntry color="#dbff7b" ratio="0.600102"/>
+              <GradientEntry color="#ffe22b" ratio="1"/>
+            </RadialGradient>
+          </fill>
+        </Rect>
+
+        <RichText fontFamily="Bitstream Vera Sans" fontSize="60" lineHeight="120%" color="#45bdb3" whiteSpaceCollapse="preserve" kerning="on" x="30" y="95" alpha="0.3">
+          <content><p><span>FXG PARSER</span></p></content>
+        </RichText>
+
+  </Group>
+</Graphic>
