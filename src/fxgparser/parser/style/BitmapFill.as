@@ -70,7 +70,7 @@ package fxgparser.parser.style
 		protected function loadBitmap( url:String ):void
 		{
 			_loading = true;
-			var loader:Loader = new Loader();
+			loader = new Loader();
 			loader.contentLoaderInfo.addEventListener( Event.COMPLETE, loadComplete );
 			loader.contentLoaderInfo.addEventListener( IOErrorEvent.IO_ERROR, loadError );
 			loader.contentLoaderInfo.addEventListener( SecurityErrorEvent.SECURITY_ERROR, loadError );
@@ -80,7 +80,6 @@ package fxgparser.parser.style
 		protected function loadComplete( e:Event ):void 
 		{
 			_loading = false;
-			var loader:Loader = e.currentTarget.loader as Loader;
 			_bitmapdata = new BitmapData( loader.content.width, loader.content.height );
 			_bitmapdata.draw( loader.content );
 			
