@@ -5,6 +5,7 @@
 	import flash.display.JointStyle;
 	import flash.display.Sprite;
 	import flash.display.BlendMode;
+	import flash.geom.ColorTransform;
 	import flash.geom.Matrix;
 	import flash.geom.Rectangle;
 	import flash.text.engine.FontWeight;
@@ -22,20 +23,19 @@
 		public var id:String = "item";
 		
 		public var display:Boolean = true;
+		public var visible:Boolean = true;
 		public var viewBox:Rectangle;
-		public var visible:Boolean;
 		
 		public var x:Number = 0;
 		public var y:Number = 0;
-		public var width:Number;
-		public var height:Number;
+		public var width:Number=0;
+		public var height:Number=0;
 		public var scaleX:Number = 1.0;
 		public var scaleY:Number = 1.0;
 		public var rotation:Number = 0;
 		public var alpha:Number = 1.0;
 		public var blendMode:String = BlendMode.NORMAL;
 		
-		//paint
 		public var fill:IStyleParser;
 		public var stroke:IStyleParser;
 		
@@ -75,11 +75,16 @@
 			parse( xml );
 		}
 		
-		public function applyStyle( d:DisplayObject , setName:Boolean = true  ):void {
-			if( setName ) d.name = id;
+		public function applyStyle( d:DisplayObject ):void {
+			try { d.name = id; }catch( e:Error ) {}
 			d.alpha = alpha;
+			d.x = x;
+			d.y = y;
+			d.scaleX = scaleX;
+			d.scaleY = scaleY;
 			d.rotation = rotation;
 			d.blendMode = blendMode;
+			d.visible = visible;
 			if ( viewBox ) d.scrollRect = viewBox;
 			if ( hasMatrix ) d.transform.matrix = transform.matrix;
 			if ( hasColorTransform ) d.transform.colorTransform = transform.colorTransform;
@@ -98,9 +103,51 @@
 		
 		public function getMatrix():Matrix 
 		{	
-			if ( hasMatrix )
-				return transform.matrix;
+			if ( hasMatrix ) return transform.matrix;
 			return new Matrix();
+		}
+		
+		public function getColorTransform():ColorTransform 
+		{	
+			if ( hasColorTransform ) return transform.colorTransform;
+			return new ColorTransform();
+		}
+		
+		public function get flashFilters():Array
+		{
+			if ( !hasFilter ) return [];
+			var fs:Array = [];
+			for each( var f:IFilter in filters )
+				fs.push( f.getFlashFilter() );
+			return fs;
+		}
+		
+		public function get hasStroke():Boolean { 
+			return stroke != null && IStroke( stroke ).weight != 0 ; 
+		}
+		public function get hasGradientStroke():Boolean { 
+			return hasStroke && stroke.colorType == ColorType.GRADIENT; 
+		}
+		public function get hasFill():Boolean { 
+			return fill != null && fill.colorType == ColorType.FLAT; 
+		}
+		public function get hasGradientFill():Boolean { 
+			return fill != null && fill.colorType == ColorType.GRADIENT;
+		}
+		public function get hasBitmapFill():Boolean { 
+			return fill != null && fill.colorType == ColorType.BITMAP;
+		}
+		public function get hasFilter():Boolean { 
+			return  filters.length > 0 ; 
+		}
+		public function get hasMatrix():Boolean { 
+			return ( transform != null && transform.hasMatrix ); 
+		}
+		public function get hasColorTransform():Boolean { 
+			return ( transform != null && transform.hasColorTransform ); 
+		}
+		public function get hasMask():Boolean { 
+			return mask != null; 
 		}
 		
 		private function setAttr( item:XML ):void
@@ -111,76 +158,26 @@
 			height = StyleUtil.validateAttr( item.@height , height );
 			alpha = StyleUtil.validateAttr( item.@alpha , alpha );
 			scaleX = StyleUtil.validateAttr( item.@scaleX , scaleX);
-			scaleX = StyleUtil.validateAttr( item.@scaleY , scaleY );
+			scaleY= StyleUtil.validateAttr( item.@scaleY , scaleY );
 			rotation = StyleUtil.validateAttr( item.@rotation ,rotation );
 			blendMode = StyleUtil.validateAttr(item.@blendMode , blendMode );
+			if ( item.@viewWidth.length() || item.@viewHeight.length() )
+				viewBox = new Rectangle( 0, 0, item.@viewWidth , item.@viewHeight );
 		}
 		
 		private function setStyle( key:String , item:XML ):void 
 		{
 			if ( key == null ) return;
-
 			if ( key == "stroke" ) 
 				stroke = getStyleFactory( item );
 			else if ( key == "fill" ) 
 				fill = getStyleFactory( item );
 			else if ( key == "filters" )
-			{
-				var f:IFilter = getFilterFactory( item );
-				if( f ) filters.push( f );
-			}
+				filters =  getFilterFactory( item );
 			else if ( key == "transform" )
 				transform = new Transform( item );
 			else if ( key == "mask" ) 
 				mask = item;
-		}
-		
-		public function get hasStroke():Boolean 
-		{ 
-			return stroke != null && IStroke( stroke ).weight != 0 ; 
-		}
-		public function get hasGradientStroke():Boolean 
-		{ 
-			return hasStroke && stroke.colorType == ColorType.GRADIENT; 
-		}
-		
-		public function get hasFill():Boolean 
-		{ 
-			return fill != null && fill.colorType == ColorType.FLAT; 
-		}
-		public function get hasGradientFill():Boolean 
-		{ 
-			return fill != null && fill.colorType == ColorType.GRADIENT;
-		}
-		public function get hasBitmapFill():Boolean 
-		{ 
-			return fill != null && fill.colorType == ColorType.BITMAP;
-		}
-		
-		public function get hasFilter():Boolean 
-		{ 
-			return  filters.length > 0 ; 
-		}
-		public function get hasMatrix():Boolean 
-		{ 
-			return ( transform != null && transform.hasMatrix ); 
-		}
-		public function get hasColorTransform():Boolean 
-		{ 
-			return ( transform != null && transform.hasColorTransform ); 
-		}
-		public function get hasMask():Boolean 
-		{ 
-			return mask != null; 
-		}
-		
-		public function get flashFilters():Array
-		{
-			if ( !hasFilter ) return [];
-			var fs:Array = [];
-			for each( var f:IFilter in filters )
-				fs.push( f.getFlashFilter() );
-			return fs;
 		}
 			
 		//Color Style
@@ -211,17 +208,18 @@
 		private static const FILTERS:Array = [ 	BlurFilter , DropShadowFilter, GlowFilter, BevelFilter , 
 												ColorMatrixFilter , GradientBevelFilter , GradientGlowFilter ];
 		
-		private static function getFilterFactory( xml:XML ):IFilter 
+		private static function getFilterFactory( xml:XML ):Array 
 		{
+			var fs:Array = [];
 			var children:XMLList  = xml.children();
 			for each( var child:XML in children )
 			{
 				var filter:IFilter = getFilterParser( child );
 				if ( !filter ) continue;
 				filter.parse( child );
-				return filter;
+				fs.push(  filter );
 			}
-			return null;
+			return fs;
 		}
 		
 		private static function getFilterParser( xml:XML  ):IFilter 

@@ -19,8 +19,8 @@
 	{
 		public static var LOCALNAME:String = "BitmapGraphic";
 		
-		private var _x:Number;
-		private var _y:Number;
+		protected var loader:Loader;
+		
 		private var _width:Number;
 		private var _height:Number;
 		private var _href:String;
@@ -39,10 +39,8 @@
 			_style = new Style( data.currentXml );
 			_data = data;
 			
-			_x = _style.x = StyleUtil.toNumber( data.currentXml.@x );
-			_y = _style.y = StyleUtil.toNumber( data.currentXml.@y );
-			_width = _style.width = StyleUtil.toNumber( data.currentXml.@width );
-			_height = _style.height = StyleUtil.toNumber( data.currentXml.@height );
+			_width = _style.width;
+			_height = _style.height;
 
 			_href = StyleUtil.toURL( data.currentXml.@source );
 
@@ -51,7 +49,7 @@
 		
 		protected function loadImage():void 
 		{
-			var loader:Loader = new Loader();
+			loader = new Loader();
 			loader.name = _style.id;
 			loader.contentLoaderInfo.addEventListener( Event.COMPLETE, loadComplete );
 			loader.contentLoaderInfo.addEventListener( IOErrorEvent.IO_ERROR, loadError );
@@ -62,19 +60,20 @@
 		
 		protected function loadComplete( e:Event ):void 
 		{
-			var loader:Loader = e.currentTarget.loader as Loader;
-			loader.x = _x;
-			loader.y = _y;
-			_style.applyStyle( loader.content , false );
-			_data = null;
-			_style = null;
-			
+			_style.applyStyle( loader.content );
+			removeListeners();
+		}
+		
+		protected function loadError( e:Event ):void { removeListeners(); }
+		
+		protected function removeListeners():void
+		{
 			loader.contentLoaderInfo.removeEventListener( Event.COMPLETE, loadComplete );
 			loader.contentLoaderInfo.removeEventListener( IOErrorEvent.IO_ERROR, loadError );
 			loader.contentLoaderInfo.removeEventListener( SecurityErrorEvent.SECURITY_ERROR, loadError );
+			_data = null;
+			_style = null;
 		}
-		
-		protected function loadError( e:Event ):void{}
 	}
 
 }

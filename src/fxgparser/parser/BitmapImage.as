@@ -12,8 +12,6 @@ package fxgparser.parser
 	{
 		public static var LOCALNAME:String = "BitmapImage";
 		
-		private var _x:Number;
-		private var _y:Number;
 		private var _width:Number;
 		private var _height:Number;
 		
@@ -24,13 +22,9 @@ package fxgparser.parser
 			var target:Shape = new Shape();
 			var style:Style = new Style( data.currentXml );
 			
-			target.x = _x = StyleUtil.toNumber( data.currentXml.@x );
-			target.y = _y = StyleUtil.toNumber( data.currentXml.@y );
-			_width = style.width =  StyleUtil.validateAttr( data.currentXml.@width, _width );
-			_height = style.height = StyleUtil.validateAttr( data.currentXml.@height, _height );
-			
-			if( data.currentXml.@scaleX.length() ) _width *= data.currentXml.@scaleX;
-			if( data.currentXml.@scaleY.length() ) _height *= data.currentXml.@scaleY;
+			_width = style.width * style.scaleX;
+			_height = style.height * style.scaleY;
+			style.scaleX = style.scaleY = 1.0;
 			
 			var fill:BitmapFill = new BitmapFill();
 			var fillxml:XML = data.currentXml.copy();

@@ -13,8 +13,6 @@
 		
 		public function Rect() { }
 		
-		private var _x:Number;
-		private var _y:Number;
 		private var _width:Number;
 		private var _height:Number;
 		
@@ -29,8 +27,6 @@
 			var xml:XML = data.currentXml;
 			var style:Style = new Style( xml );
 			
-			target.x = _x = style.x;
-			target.y = _y = style.y;
 			_width = style.width;
 			_height = style.height;
 			

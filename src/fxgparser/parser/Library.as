@@ -12,16 +12,7 @@
 		
 		public function Library() { }
 		
-		public function parse( data:Data ):void {
-			var style:Style = new Style( data.currentXml );
-			var group:Sprite = new Sprite();
-			group.name = style.id;
-			style.applyStyle( group );
-			var groupXML:XML = data.currentXml.copy();
-			groupXML.setLocalName(  "_defs" );	
-			FxgFactory.parseData( data.copy( groupXML, group ) );
-			group = null;
-		}
+		public function parse( data:Data ):void {}
 	}
 
 }

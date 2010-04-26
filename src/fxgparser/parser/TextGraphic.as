@@ -9,6 +9,7 @@
 	import flashx.textLayout.container.ContainerController;
 	import flashx.textLayout.formats.TextLayoutFormat;
 	import flashx.textLayout.events.StatusChangeEvent;
+	import flashx.textLayout.elements.InlineGraphicElementStatus;
 	import fxgparser.parser.model.Data;
 	import fxgparser.parser.style.Style;
 	import flash.text.engine.FontLookup;
@@ -21,10 +22,8 @@
 		
 		private var sprite:Sprite;
 		
-		private var _x:Number = 0;
-		private var _y:Number = 0;
-		private var _width:Number = 1000;
-		private var _height:Number = 1000;
+		private var _width:Number;
+		private var _height:Number;
 		
 		private var _textFlow:TextFlow;
 		
@@ -41,10 +40,10 @@
 			
 			format.fontFamily = StyleUtil.validateAttr( data.currentXml.@fontFamily , Constants.FONT_FAMILY );
 			format.fontSize = StyleUtil.validateAttr( data.currentXml.@fontSize,Constants.FONT_SIZE );
-			format.lineHeight = StyleUtil.validateAttr( data.currentXml.@lineHeight, 0 );
-			format.color = StyleUtil.validateAttr( data.currentXml.@color,Constants.FILL_COLOR );
-			format.kerning = StyleUtil.validateAttr( data.currentXml.@kerning, "none" );
-			format.whiteSpaceCollapse = StyleUtil.validateAttr( data.currentXml.@whiteSpaceCollapse, "preserve" );
+			format.lineHeight = StyleUtil.validateAttr( data.currentXml.@lineHeight, format.lineHeight );
+			format.color = StyleUtil.validateAttr( data.currentXml.@color, format.color );
+			format.kerning = StyleUtil.validateAttr( data.currentXml.@kerning, format.kerning );
+			format.whiteSpaceCollapse = StyleUtil.validateAttr( data.currentXml.@whiteSpaceCollapse, format.whiteSpaceCollapse );
 			
 			format.fontWeight = StyleUtil.validateAttr( data.currentXml.@fontWeight , format.fontWeight );
 			format.fontStyle = StyleUtil.validateAttr( data.currentXml.@fontStyle, format.fontStyle );
@@ -64,27 +63,31 @@
 			format.trackingLeft  = StyleUtil.validateAttr( data.currentXml.@trackingLeft , format.trackingLeft );
 			format.trackingRight  = StyleUtil.validateAttr( data.currentXml.@trackingRight , format.trackingRight );
 			
-			sprite.x = _x = style.x = data.currentXml.@x;
-			sprite.y = _y = style.y = data.currentXml.@y;
-			_width = style.width = StyleUtil.validateAttr(  data.currentXml.@width , _width);
-			_height = style.height = StyleUtil.validateAttr( data.currentXml.@height , _height );
+			_width = style.width = StyleUtil.validateAttr(  data.currentXml.@width , NaN );
+			_height = style.height = StyleUtil.validateAttr( data.currentXml.@height , NaN );
 
-			style.applyStyle( sprite );
+			var fxg:Namespace = Constants.fxg;
+			var flowxml:XML = < TextFlow xmlns = "http://ns.adobe.com/textLayout/2008" /> ;
+			var content:XML = data.currentXml..fxg::content[0].copy();
+			if ( !content ) return;
+			for each( var item:XML in content.descendants() )
+				item.setNamespace( flowxml.namespace() );
+			flowxml.appendChild( content.children() );
 			
-			data.currentCanvas.addChild( sprite );
-			
-			var content:XML = data.currentXml.copy();
-
-			_textFlow = TextConverter.importToFlow( content , TextConverter.TEXT_FIELD_HTML_FORMAT );
+			_textFlow = TextConverter.importToFlow(  flowxml , TextConverter.TEXT_LAYOUT_FORMAT );
 			_textFlow.hostFormat = format;
-			_textFlow.flowComposer.addController( new ContainerController( sprite , _width, _height ) );
+			_textFlow.flowComposer.addController( new ContainerController( sprite , _width , _height ) );
 			_textFlow.addEventListener(StatusChangeEvent.INLINE_GRAPHIC_STATUS_CHANGE , onImageLoaded );
 			_textFlow.flowComposer.updateAllControllers();
+
+			style.applyStyle( sprite );
+			data.currentCanvas.addChild( sprite );
 		}
 		
 		private function onImageLoaded( e:StatusChangeEvent ):void
 		{
-			_textFlow.flowComposer.updateAllControllers();
+			if (e.status == InlineGraphicElementStatus.READY || e.status == InlineGraphicElementStatus.SIZE_PENDING)
+				_textFlow.flowComposer.updateAllControllers();
 		}
 	}
 

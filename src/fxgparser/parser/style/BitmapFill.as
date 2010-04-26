@@ -17,6 +17,8 @@ package fxgparser.parser.style
 	{
 		public static var LOCALNAME:String = "BitmapFill";
 		
+		protected var loader:Loader;
+		
 		protected var _x:Number=0;
 		protected var _y:Number=0;
 		protected var _scaleX:Number = 1;
@@ -85,15 +87,22 @@ package fxgparser.parser.style
 			dispatchEvent( new Event( Event.COMPLETE ) );
 
 			loader.unload();
-			loader.contentLoaderInfo.removeEventListener( Event.COMPLETE, loadComplete );
-			loader.contentLoaderInfo.removeEventListener( IOErrorEvent.IO_ERROR, loadError );
-			loader.contentLoaderInfo.removeEventListener( SecurityErrorEvent.SECURITY_ERROR, loadError );
+			removeListeners();
 		}
 		
 		protected function loadError( e:Event ):void
 		{
 			_loading = false;
 			dispatchEvent( new Event( Event.CANCEL ) );
+			dispatchEvent( new Event( Event.COMPLETE ) );
+			removeListeners();
+		}
+		
+		protected function removeListeners():void
+		{
+			loader.contentLoaderInfo.removeEventListener( Event.COMPLETE, loadComplete );
+			loader.contentLoaderInfo.removeEventListener( IOErrorEvent.IO_ERROR, loadError );
+			loader.contentLoaderInfo.removeEventListener( SecurityErrorEvent.SECURITY_ERROR, loadError );
 		}
 		
 		public function get colorType():int { return ColorType.BITMAP; }

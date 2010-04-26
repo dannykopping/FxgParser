@@ -55,8 +55,11 @@
 					});
 					return;
 				}
-				bfill.setSize( itemRect );
-				target.graphics.beginBitmapFill( bfill.bitmapdata, bfill.matrix , bfill.repeat );
+				if ( bfill.bitmapdata )
+				{
+					bfill.setSize( itemRect );
+					target.graphics.beginBitmapFill( bfill.bitmapdata, bfill.matrix , bfill.repeat );
+				}
 			}
 			
 			draw( target.graphics );	//draw graphics

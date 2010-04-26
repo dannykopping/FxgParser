@@ -25,7 +25,6 @@
 		
 		public static function toURL( val:String ):String 
 		{
-			//return val.replace(/url\(#(.+)\)/ , "$1" );
 			return val.replace(/\@Embed\(\'(.+)\'\)/ , "$1" );
 		}
 		

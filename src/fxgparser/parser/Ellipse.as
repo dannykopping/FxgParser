@@ -22,9 +22,6 @@
 			var target:Shape = new Shape();
 			var style:Style = new Style( data.currentXml );
 			
-			target.x = style.x;
-			target.y = style.y;
-			
 			_rx = style.width  / 2;
 			_ry = style.height / 2;
 
