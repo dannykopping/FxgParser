@@ -8,14 +8,17 @@ package fxgparser.parser.filters
 		
 		public static var LOCALNAME:String = "ColorMatrixFilter";
 		
-		private var _matrix:Array = [];
+		private var _matrix:Array = [ 1, 0, 0, 0, 0,
+									  0, 1, 0, 0, 0,
+									  0, 0, 1, 0, 0,
+									  0, 0, 0, 1, 0 ];
 		
 		public function ColorMatrixFilter() { }
 		
 		public function parse( xml:XML ):void
 		{
-			var m:XML = xml..matrix[0];
-			_matrix = [ m.@a, m.@b, m.@c, m.@d, m.@tx, m.@ty ];
+			var m:String = xml.@matrix.toString();
+			_matrix = m.split( "," );
 		}
 		
 		public function getFlashFilter():BitmapFilter 
