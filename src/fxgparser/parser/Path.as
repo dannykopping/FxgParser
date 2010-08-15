@@ -14,7 +14,7 @@
 		
 		private var _commands:Vector.<int> = new Vector.<int>;
 		private var _vertices:Vector.<Number> = new Vector.<Number>;
-		private var _winding:String;
+		private var _winding:String = 'evenOdd';
 		
 		public function Path() {}
 		
@@ -22,7 +22,10 @@
 		{
 			var target:Shape = new Shape();
 			var style:Style = new Style( data.currentXml );
-			_winding = data.currentXml.@winding;
+			
+			if( data.currentXml.@winding.length() ) 
+				_winding = data.currentXml.@winding;
+				
 			var d:String = data.currentXml.@data.toString();
 			parsePath( d );
 			
