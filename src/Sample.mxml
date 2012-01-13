@@ -8,29 +8,30 @@
 	</fx:Declarations>
 	
 	<fx:Script><![CDATA[
-		
-		import flash.events.Event;
-		import flash.net.*;
-		import fxgparser.FxgDisplay;
-		import spark.core.SpriteVisualElement;
-		
-		
-		public var fxgurl:String = "fxg/fxgparser.fxg";
-		public var fxgSprite:FxgDisplay;
-		
-		public function loadSVG():void {
-			XML.ignoreWhitespace = false;	//to preserve spaces inside texts
-			var loader:URLLoader = new URLLoader( new URLRequest( fxgurl ) );
-			loader.addEventListener( Event.COMPLETE , displayData );
-		}
-		
-		public function displayData( e:Event ):void {
-			var fxgxml:XML = XML( e.currentTarget.data );
-			fxgSprite = new FxgDisplay( fxgxml );	//parse SVG
-			canvas.addChild( fxgSprite );
-		}
+        import flash.events.Event;
+        import flash.net.*;
 
-	]]></fx:Script>
+        import org.libspark.fxgparser.FxgDisplay;
+
+        import spark.core.SpriteVisualElement;
+
+        public var fxgurl:String = "fxg/org.libspark.fxgparser.fxg";
+        public var fxgSprite:FxgDisplay;
+
+        public function loadSVG():void
+        {
+            XML.ignoreWhitespace = false;	//to preserve spaces inside texts
+            var loader:URLLoader = new URLLoader(new URLRequest(fxgurl));
+            loader.addEventListener(Event.COMPLETE, displayData);
+        }
+
+        public function displayData(e:Event):void
+        {
+            var fxgxml:XML = XML(e.currentTarget.data);
+            fxgSprite = new FxgDisplay(fxgxml);	//parse SVG
+            canvas.addChild(fxgSprite);
+        }
+        ]]></fx:Script>
 	
 	<s:SpriteVisualElement id="canvas" />
 	

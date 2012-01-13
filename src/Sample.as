@@ -4,12 +4,12 @@
 	import flash.events.Event;
 	import flash.net.*;
 	
-	import fxgparser.FxgDisplay;
+	import org.libspark.fxgparser.FxgDisplay;
 	
 
 	public class Sample extends Sprite 
 	{
-		public var fxgurl:String = "fxg/fxgparser.fxg";
+		public var fxgurl:String = "fxg/org.libspark.fxgparser.fxg";
 		public var fxgSprite:FxgDisplay;
 		
 		public function Sample():void 
