@@ -3,8 +3,10 @@
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import org.libspark.fxgparser.parser.FxgFactory;
-	
-	public class FxgDisplay extends Sprite{
+
+	import spark.core.SpriteVisualElement;
+
+	public class FxgDisplay extends SpriteVisualElement {
 		
 		private var _factory:FxgFactory;
 		
